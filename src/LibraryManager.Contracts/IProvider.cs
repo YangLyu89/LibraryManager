@@ -61,5 +61,11 @@ namespace Microsoft.Web.LibraryManager.Contracts
         /// </summary>
         /// <param name="library"></param>
         string GetSuggestedDestination(ILibrary library);
+
+        /// <summary>
+        /// Checks if the given libraryId is valid.
+        /// </summary>
+        /// <param name="libaryId"></param>
+        bool IsLibraryIdValid(string libaryId);
     }
 }

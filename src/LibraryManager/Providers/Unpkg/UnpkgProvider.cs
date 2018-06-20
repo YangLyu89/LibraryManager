@@ -308,5 +308,10 @@ namespace Microsoft.Web.LibraryManager.Providers.Unpkg
 
             return LibraryOperationResult.FromSuccess(desiredState);
         }
+
+        public bool IsLibraryIdValid(string libraryId)
+        {
+            return false;
+        }
     }
 }

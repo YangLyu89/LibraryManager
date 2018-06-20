@@ -257,5 +257,10 @@ namespace Microsoft.Web.LibraryManager.Providers.FileSystem
                 throw new ResourceDownloadException(sourceUrl);
             }
         }
+
+        public bool IsLibraryIdValid(string libraryId)
+        {
+            return false;
+        }
     }
 }

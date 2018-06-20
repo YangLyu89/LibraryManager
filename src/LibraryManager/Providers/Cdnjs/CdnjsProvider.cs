@@ -349,5 +349,9 @@ namespace Microsoft.Web.LibraryManager.Providers.Cdnjs
             return true;
         }
 
+        public bool IsLibraryIdValid(string libraryId)
+        {
+            return false;
+        }
     }
 }

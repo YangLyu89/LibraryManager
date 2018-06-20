@@ -30,6 +30,7 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Models
         private FileSelectionType _fileSelectionType;
         private bool _anyFileSelected;
         private bool _isTreeViewEmpty;
+        private bool _isLibraryIdValid;
 
         public InstallDialogViewModel(Dispatcher dispatcher, ILibraryCommandService libraryCommandService, string configFileName, IDependencies deps, string targetPath, Action<bool> closeDialog)
         {
@@ -41,6 +42,7 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Models
             _closeDialog = closeDialog;
             _anyFileSelected = false;
             _isTreeViewEmpty = true;
+            _isLibraryIdValid = false;
 
             List<IProvider> providers = new List<IProvider>();
             foreach (IProvider provider in deps.Providers.OrderBy(x => x.Id))
@@ -70,6 +72,12 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Models
         {
             get { return _availablePackages; }
             set { Set(ref _availablePackages, value); }
+        }
+
+        public bool IsLibraryIdValid
+        {
+            get { return _isLibraryIdValid; }
+            set { Set(ref _isLibraryIdValid, value); }
         }
 
         public IReadOnlyList<PackageItem> DisplayRoots
@@ -128,10 +136,17 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Models
 
                     AnyFileSelected = false;
                     DisplayRoots = null;
+                    IsLibraryIdValid = SelectedProvider.IsLibraryIdValid(value);
+
+                    if (!IsLibraryIdValid)
+                    {
+                        RefreshFileSelections();
+                    }
                 }
                 else if (Set(ref _packageId, value))
                 {
                     RefreshFileSelections();
+                    IsLibraryIdValid = false;
                 }
             }
         }
@@ -325,7 +340,7 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Models
             }
 
             AnyFileSelected = IsAnyFileSelected(DisplayRoots);
-            return AnyFileSelected;
+            return AnyFileSelected && IsLibraryIdValid;
         }
 
         private static bool IsAnyFileSelected(IReadOnlyList<PackageItem> children)

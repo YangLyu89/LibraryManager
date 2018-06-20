@@ -44,6 +44,17 @@ namespace Microsoft.Web.LibraryManager.Mocks
         public string LibraryIdHintText { get; set; }
 
         /// <summary>
+        /// Checks if libraryId is valid
+        /// </summary>
+        /// <remarks>
+        /// If given libraryId is true, returns true, false otherwise
+        /// </remarks>
+        public bool IsLibraryIdValid(string libraryId)
+        {
+            return false;
+        }
+
+        /// <summary>
         /// An object specified by the host to interact with the file system etc.
         /// </summary>
         public virtual IHostInteraction HostInteraction { get; set; }
