@@ -437,5 +437,7 @@ namespace Microsoft.Web.LibraryManager.Resources {
                 return ResourceManager.GetString("Update_LibrarySucceeded", resourceCulture);
             }
         }
+
+        public static string InvalidLibraryId { get; internal set; }
     }
 }

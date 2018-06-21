@@ -250,4 +250,7 @@
   <data name="LibraryDetail_Unavailable" xml:space="preserve">
     <value>Unavailable</value>
   </data>
+  <data name="InvalidLibraryId" xml:space="preserve">
+    <value>The library could not be resolved by the provider</value>
+  </data>
 </root>

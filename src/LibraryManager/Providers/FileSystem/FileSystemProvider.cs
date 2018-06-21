@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Web.LibraryManager.Contracts;
 using Microsoft.Web.LibraryManager.Resources;
+using ThreadHelper = Microsoft.VisualStudio.Shell.ThreadHelper;
 
 namespace Microsoft.Web.LibraryManager.Providers.FileSystem
 {
@@ -260,6 +261,34 @@ namespace Microsoft.Web.LibraryManager.Providers.FileSystem
 
         public bool IsLibraryIdValid(string libraryId)
         {
+            ILibraryCatalog catalog = GetCatalog();
+
+            if (catalog != null)
+            {
+                ILibrary library = null;
+
+                try
+                {
+                    ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    {
+                        library = await catalog.GetLibraryAsync(libraryId, CancellationToken.None).ConfigureAwait(false);
+                    });
+
+                    if (library != null &&
+                        !string.IsNullOrEmpty(library.Name) &&
+                        !string.IsNullOrEmpty(library.Version))
+                    {
+                        return true;
+                    }
+                }
+                catch (InvalidLibraryException e)
+                {
+                    WarningMessage.Text = Text.InvalidLibraryId;
+
+                    return false;
+                }
+            }
+
             return false;
         }
     }

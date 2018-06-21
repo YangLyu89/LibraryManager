@@ -136,7 +136,7 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Models
 
                     AnyFileSelected = false;
                     DisplayRoots = null;
-                    IsLibraryIdValid = SelectedProvider.IsLibraryIdValid(value);
+                    IsLibraryIdValid = false;
 
                     if (!IsLibraryIdValid)
                     {
@@ -146,7 +146,7 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Models
                 else if (Set(ref _packageId, value))
                 {
                     RefreshFileSelections();
-                    IsLibraryIdValid = false;
+                    IsLibraryIdValid = SelectedProvider.IsLibraryIdValid(value);
                 }
             }
         }

@@ -23,6 +23,7 @@
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="System.ValueTuple" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
     <ProjectReference Include="..\LibraryManager.Contracts\Microsoft.Web.LibraryManager.Contracts.csproj" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" />
     <Reference Include="System.ComponentModel.Composition" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
     <Reference Include="System.Net.Http" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
     <Reference Include="System.Web" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
