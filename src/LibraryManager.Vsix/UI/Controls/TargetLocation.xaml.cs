@@ -268,13 +268,5 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
                 }));
             });
         }
-
-        private void ThisControl_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (!Options.IsKeyboardFocusWithin && !TargetLocationSearchTextBox.IsKeyboardFocusWithin && !Flyout.IsKeyboardFocusWithin)
-            {
-                TargetLocationSearchTextBox.Focus();
-            }
-        }
     }
 }
