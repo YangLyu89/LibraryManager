@@ -228,6 +228,8 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
             {
                 if (Volatile.Read(ref _version) != expect)
                 {
+                    Items.Clear();
+
                     return;
                 }
 
@@ -246,6 +248,8 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
                         {
                             if (Volatile.Read(ref _version) != expect || span.Completions == null)
                             {
+                                Items.Clear();
+
                                 return;
                             }
 
@@ -267,6 +271,22 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
                     });
                 }));
             });
+        }
+
+        private void TargetLocationSearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            RefreshSearch();
+
+            if (HasItems)
+            {
+                Flyout.IsOpen = true;
+                Options.Visibility = Visibility.Visible;
+            }
+            else
+            {
+               Flyout.IsOpen = false;
+               Options.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }
