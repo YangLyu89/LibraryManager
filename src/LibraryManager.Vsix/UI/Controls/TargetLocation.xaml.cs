@@ -228,6 +228,8 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
             {
                 if (Volatile.Read(ref _version) != expect)
                 {
+                    Items.Clear();
+
                     return;
                 }
 
@@ -246,6 +248,8 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
                         {
                             if (Volatile.Read(ref _version) != expect || span.Completions == null)
                             {
+                                Items.Clear();
+
                                 return;
                             }
 
@@ -269,11 +273,19 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
             });
         }
 
-        private void ThisControl_GotFocus(object sender, RoutedEventArgs e)
+        private void TargetLocationSearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-            if (!Options.IsKeyboardFocusWithin && !TargetLocationSearchTextBox.IsKeyboardFocusWithin && !Flyout.IsKeyboardFocusWithin)
+            RefreshSearch();
+
+            if (HasItems)
             {
-                TargetLocationSearchTextBox.Focus();
+                Flyout.IsOpen = true;
+                Options.Visibility = Visibility.Visible;
+            }
+            else
+            {
+               Flyout.IsOpen = false;
+               Options.Visibility = Visibility.Collapsed;
             }
         }
     }
