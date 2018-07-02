@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Web.LibraryManager.Contracts;
 using Microsoft.Web.LibraryManager.Vsix.UI.Models;
@@ -14,16 +14,16 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
     public partial class TargetLocation : INotifyPropertyChanged
     {
         public static readonly DependencyProperty CaretIndexProperty = DependencyProperty.Register(
-            nameof(CaretIndex), typeof(int), typeof(TargetLocation), new PropertyMetadata(default(int), SearchCriteriaChanged));
+            nameof(CaretIndex), typeof(int), typeof(TargetLocation), new PropertyMetadata(default(int)));
 
         public static readonly DependencyProperty SearchServiceProperty = DependencyProperty.Register(
-            nameof(SearchService), typeof(Func<string, int, Task<CompletionSet>>), typeof(TargetLocation), new PropertyMetadata(default(Func<string, int, Task<CompletionSet>>), SearchCriteriaChanged));
+            nameof(SearchService), typeof(Func<string, int, Task<CompletionSet>>), typeof(TargetLocation), new PropertyMetadata(default(Func<string, int, Task<CompletionSet>>)));
 
         public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(
             nameof(SelectedItem), typeof(Completion), typeof(TargetLocation), new PropertyMetadata(default(Completion)));
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            nameof(Text), typeof(string), typeof(TargetLocation), new PropertyMetadata(default(string), SearchCriteriaChanged));
+            nameof(Text), typeof(string), typeof(TargetLocation), new PropertyMetadata(default(string)));
 
         private int _version;
         private string _text;
@@ -31,6 +31,9 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
         public TargetLocation()
         {
             InitializeComponent();
+
+            // Pre populate textBox with folder name
+            TargetLocationSearchTextBox.Text = InstallationFolder.DestinationFolder;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -63,37 +66,13 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
 
         public string Text
         {
-            get
-            {
-                _text = (string)GetValue(TextProperty);
-
-                // Pre populate textBox with folder name
-                if (_text == null)
-                {
-                    _text = InstallationFolder.DestinationFolder;
-                    TargetLocationSearchTextBox.Text = _text;
-                }
-
-                InstallationFolder.DestinationFolder = _text;
-                return _text;
-            }
-            set
-            {
-                SetValue(TextProperty, value);
-                InstallationFolder.DestinationFolder = value;
-            }
+            get { return (string)GetValue(TextProperty); }
+            set { SetValue(TextProperty, value); }
         }
 
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private static void SearchCriteriaChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            //TargetLocation search = d as TargetLocation;
-            //search?.RefreshSearch();
-            //search?.PropertyChanged?.Invoke(search, new PropertyChangedEventArgs(nameof(IsTextEntryEmpty)));
         }
 
         private void Commit(Completion completion)
@@ -104,14 +83,15 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
             }
 
             Text = completion.CompletionItem.InsertionText;
+            TargetLocationSearchTextBox.CaretIndex = Text.IndexOf(completion.CompletionItem.DisplayText, StringComparison.OrdinalIgnoreCase) + completion.CompletionItem.DisplayText.Length;
             Flyout.IsOpen = false;
-            //TargetLocationSearchTextBox.CaretIndex = Text.IndexOf(completion.CompletionItem.DisplayText, StringComparison.OrdinalIgnoreCase) + completion.CompletionItem.DisplayText.Length;
         }
 
         private void HandleKeyPress(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
+                case Key.Tab:
                 case Key.Enter:
                     Commit(SelectedItem);
                     break;
@@ -131,12 +111,6 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
                     break;
             }
         }
-
-        //private void HandleKeyUp(object sender, KeyEventArgs e)
-        //{
-        //    CaretIndex = TargetLocationSearchTextBox.CaretIndex;
-        //    RefreshSearch();
-        //}
 
         private void HandleListBoxKeyPress(object sender, KeyEventArgs e)
         {
@@ -182,7 +156,6 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
         {
             Commit(SelectedItem);
             e.Handled = true;
-            TargetLocationSearchTextBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
 
         private void OnLostFocus(object sender, RoutedEventArgs e)
@@ -190,17 +163,9 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
             if (SelectedItem != null && !Options.IsKeyboardFocusWithin)
             {
                 Commit(SelectedItem);
+                TargetLocationSearchTextBox.ScrollToEnd();
             }
         }
-
-        //private void OnMousePositionCaret(object sender, MouseButtonEventArgs e)
-        //{
-        //    if (CaretIndex != TargetLocationSearchTextBox.CaretIndex)
-        //    {
-        //        CaretIndex = TargetLocationSearchTextBox.CaretIndex;
-        //        RefreshSearch();
-        //    }
-        //}
 
         private void PositionCompletions(int index)
         {
@@ -210,101 +175,55 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
             Flyout.Width = Options.DesiredSize.Width;
         }
 
-        //private void RefreshSearch()
-        //{
-        //    if (Text == null)
-        //    {
-        //        return;
-        //    }
-
-        //    string lastSelected = SelectedItem?.CompletionItem.InsertionText;
-        //    int expect = Interlocked.Increment(ref _version);
-
-        //    string text = Text;
-        //    int caretIndex = text.Length;
-        //    Func<string, int, Task<CompletionSet>> searchService = SearchService;
-
-        //    VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async () =>
-        //    {
-        //        CompletionSet span = await SearchService?.Invoke(text, caretIndex);
-        //    });
-
-        //    Dispatcher.BeginInvoke((Action)(() =>
-        //    {
-        //        searchService?.Invoke(text, caretIndex).ContinueWith(t =>
-        //        {
-        //            if (t.IsCanceled || t.IsFaulted)
-        //            {
-        //                return;
-        //            }
-
-        //            CompletionSet span = t.Result;
-
-        //            Dispatcher.BeginInvoke((Action)(() =>
-        //            {
-        //                if (Volatile.Read(ref _version) != expect || span.Completions == null)
-        //                {
-        //                    return;
-        //                }
-
-        //                Items.Clear();
-        //                foreach (CompletionItem entry in span.Completions)
-        //                {
-        //                    Items.Add(new Completion(entry, span.Start, span.Length));
-        //                }
-
-        //                if (Items.Count > 0)
-        //                {
-        //                    PositionCompletions(span.Length);
-        //                    OnPropertyChanged(nameof(HasItems));
-
-        //                    if (Items != null && Items.Count > 0 && Options.SelectedIndex == -1)
-        //                    {
-        //                        SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.InsertionText == lastSelected) ?? Items[0];
-        //                        Options.ScrollIntoView(SelectedItem);
-        //                    }
-        //                }
-        //            }));
-        //        });
-        //    }));
-        //}
-
         private void TargetLocationSearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-            if (CaretIndex != TargetLocationSearchTextBox.CaretIndex)
+            TextChange textChange = e.Changes.Last();
+
+            if (textChange.AddedLength > 0)
             {
-                CaretIndex = TargetLocationSearchTextBox.CaretIndex;
-
-                CompletionSet completionSet;
-
-                VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async () =>
+                if (TargetLocationSearchTextBox.CaretIndex > 0)
                 {
-                    completionSet = await SearchService?.Invoke(Text, TargetLocationSearchTextBox.CaretIndex);
+                    CaretIndex = TargetLocationSearchTextBox.CaretIndex;
 
-                    Items.Clear();
+                    CompletionSet completionSet;
 
-                    if (completionSet.Completions != null)
-                    {         
-                        foreach (CompletionItem entry in completionSet.Completions)
+                    VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    {
+                        completionSet = await SearchService?.Invoke(Text, TargetLocationSearchTextBox.CaretIndex);
+
+                        Items.Clear();
+
+                        if (completionSet.Completions != null)
                         {
-                            Items.Add(new Completion(entry, completionSet.Start, completionSet.Length));
-                        }
-
-                        if (Items.Count > 0)
-                        {
-                            PositionCompletions(completionSet.Length);
-
-                            if (Items != null && Items.Count > 0 && Options.SelectedIndex == -1)
+                            foreach (CompletionItem entry in completionSet.Completions)
                             {
-                                string lastSelected = SelectedItem?.CompletionItem.InsertionText;
-                                SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.InsertionText == lastSelected) ?? Items[0];
-                                Options.ScrollIntoView(SelectedItem);
+                                Items.Add(new Completion(entry, completionSet.Start, completionSet.Length));
                             }
 
-                            Flyout.IsOpen = true;
+                            if (Items.Count > 0)
+                            {
+                                PositionCompletions(completionSet.Length);
+
+                                if (Items != null && Items.Count > 0 && Options.SelectedIndex == -1)
+                                {
+                                    string lastSelected = SelectedItem?.CompletionItem.InsertionText;
+                                    SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.InsertionText == lastSelected) ?? Items[0];
+                                    Options.ScrollIntoView(SelectedItem);
+                                }
+
+                                Flyout.IsOpen = true;
+                            }
+                            else
+                            {
+                                Flyout.IsOpen = false;
+                            }
                         }
-                    }
-                }); 
+                    });
+                }
+                else
+                {
+                    Flyout.IsOpen = false;
+                }
             }
         }
     }
