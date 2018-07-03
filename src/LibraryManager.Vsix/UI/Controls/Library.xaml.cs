@@ -235,19 +235,14 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
                             Options.ScrollIntoView(SelectedItem);
 
                             Flyout.IsOpen = true;
-                        }
-                        else
-                        {
-                            Flyout.IsOpen = false;
-                        }
-
+                        }                      
                     });
                 }
-                else
-                {
-                    Flyout.IsOpen = false;
-                }
+
+                return;
             }
+
+            Flyout.IsOpen = false;
         }
     }
 }

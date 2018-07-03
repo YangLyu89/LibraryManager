@@ -213,18 +213,14 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
 
                                 Flyout.IsOpen = true;
                             }
-                            else
-                            {
-                                Flyout.IsOpen = false;
-                            }
                         }
                     });
                 }
-                else
-                {
-                    Flyout.IsOpen = false;
-                }
+
+                return;
             }
+
+            Flyout.IsOpen = false;
         }
     }
 }
