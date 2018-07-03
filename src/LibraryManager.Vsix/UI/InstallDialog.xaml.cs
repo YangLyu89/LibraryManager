@@ -192,7 +192,7 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI
             }
             else
             {
-                LibrarySearchBox.RefreshSearch();
+               // LibrarySearchBox.RefreshSearch();
             }
         }
 

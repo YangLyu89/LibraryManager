@@ -175,7 +175,7 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
             Flyout.Width = Options.DesiredSize.Width;
         }
 
-        private void TargetLocationSearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void TargetLocationSearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextChange textChange = e.Changes.Last();
 
