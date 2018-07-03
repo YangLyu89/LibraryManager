@@ -188,56 +188,49 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
         {
             TextChange textChange = e.Changes.Last();
 
+            // We will invoke completion on text insertion and not deletion.
             if (textChange.AddedLength > 0)
             {
-                if (LibrarySearchBox.CaretIndex > 0)
+                VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async () =>
                 {
-                    string lastSelected = SelectedItem?.CompletionItem.InsertionText;
+                    CompletionSet completionSet = await SearchService?.Invoke(Text, LibrarySearchBox.CaretIndex);
 
-                    string text = Text;
-                    int caretIndex = text.Length;
-                    int atIndex = text.IndexOf('@');
+                    int atIndex = Text.IndexOf('@');
 
-                    CompletionSet completionSet;
-
-                    VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    if (atIndex >= 0)
                     {
-                        completionSet = await SearchService?.Invoke(Text, LibrarySearchBox.CaretIndex);
+                        completionSet.Completions = FilterOutUnmatchedItems(completionSet.Completions, Text.Substring(atIndex + 1));
+                    }
 
-                        Items.Clear();
+                    Items.Clear();
 
+                    foreach (CompletionItem entry in completionSet.Completions)
+                    {
+                        Items.Add(new Completion(entry, completionSet.Start, completionSet.Length));
+                    }
+
+                    PositionCompletions(completionSet.Length);
+
+                    OnPropertyChanged(nameof(HasItems));
+                    OnPropertyChanged(nameof(IsTextEntryEmpty));
+
+                    if (Items != null && Items.Count > 0 && Options.SelectedIndex == -1)
+                    {
                         if (atIndex >= 0)
                         {
-                            completionSet.Completions = FilterOutUnmatchedItems(completionSet.Completions, text.Substring(atIndex + 1));
+                            SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.DisplayText.StartsWith(Text.Substring(atIndex + 1))) ?? Items[0];
+                        }
+                        else
+                        {
+                            string lastSelected = SelectedItem?.CompletionItem.InsertionText;
+                            SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.InsertionText == lastSelected) ?? Items[0];
                         }
 
-                        foreach (CompletionItem entry in completionSet.Completions)
-                        {
-                            Items.Add(new Completion(entry, completionSet.Start, completionSet.Length));
-                        }
+                        Options.ScrollIntoView(SelectedItem);
 
-                        PositionCompletions(completionSet.Length);
-
-                        OnPropertyChanged(nameof(HasItems));
-                        OnPropertyChanged(nameof(IsTextEntryEmpty));
-
-                        if (Items != null && Items.Count > 0 && Options.SelectedIndex == -1)
-                        {
-                            if (atIndex >= 0)
-                            {
-                                SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.DisplayText.StartsWith(text.Substring(atIndex + 1))) ?? Items[0];
-                            }
-                            else
-                            {
-                                SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.InsertionText == lastSelected) ?? Items[0];
-                            }
-
-                            Options.ScrollIntoView(SelectedItem);
-
-                            Flyout.IsOpen = true;
-                        }                      
-                    });
-                }
+                        Flyout.IsOpen = true;
+                    }
+                });
 
                 return;
             }

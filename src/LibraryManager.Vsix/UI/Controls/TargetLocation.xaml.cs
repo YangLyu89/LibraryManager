@@ -179,43 +179,37 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
         {
             TextChange textChange = e.Changes.Last();
 
-            if (textChange.AddedLength > 0)
+            // We will invoke completion on text insertion and not deletion.
+            if (textChange.AddedLength > 0 && TargetLocationSearchTextBox.CaretIndex > 0)
             {
-                if (TargetLocationSearchTextBox.CaretIndex > 0)
+                VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async () =>
                 {
-                    CaretIndex = TargetLocationSearchTextBox.CaretIndex;
+                    CompletionSet completionSet = await SearchService?.Invoke(Text, TargetLocationSearchTextBox.CaretIndex);
 
-                    CompletionSet completionSet;
-
-                    VisualStudio.Shell.ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    if (completionSet.Completions != null)
                     {
-                        completionSet = await SearchService?.Invoke(Text, TargetLocationSearchTextBox.CaretIndex);
-
                         Items.Clear();
 
-                        if (completionSet.Completions != null)
+                        foreach (CompletionItem entry in completionSet.Completions)
                         {
-                            foreach (CompletionItem entry in completionSet.Completions)
-                            {
-                                Items.Add(new Completion(entry, completionSet.Start, completionSet.Length));
-                            }
-
-                            if (Items.Count > 0)
-                            {
-                                PositionCompletions(completionSet.Length);
-
-                                if (Items != null && Items.Count > 0 && Options.SelectedIndex == -1)
-                                {
-                                    string lastSelected = SelectedItem?.CompletionItem.InsertionText;
-                                    SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.InsertionText == lastSelected) ?? Items[0];
-                                    Options.ScrollIntoView(SelectedItem);
-                                }
-
-                                Flyout.IsOpen = true;
-                            }
+                            Items.Add(new Completion(entry, completionSet.Start, completionSet.Length));
                         }
-                    });
-                }
+
+                        if (Items.Count > 0)
+                        {
+                            PositionCompletions(completionSet.Length);
+
+                            if (Items != null && Items.Count > 0 && Options.SelectedIndex == -1)
+                            {
+                                string lastSelected = SelectedItem?.CompletionItem.InsertionText;
+                                SelectedItem = Items.FirstOrDefault(x => x.CompletionItem.InsertionText == lastSelected) ?? Items[0];
+                                Options.ScrollIntoView(SelectedItem);
+                            }
+
+                            Flyout.IsOpen = true;
+                        }
+                    }
+                });
 
                 return;
             }
