@@ -9,7 +9,6 @@
              x:Name="ThisControl">
     <UserControl.Resources>
         <search:LogicalOrConverter x:Key="LogicalOr" />
-        <search:LogicalAndConverter x:Key="LogicalAnd" />
     </UserControl.Resources>
     <Grid>
         <!-- Text Entry -->

@@ -10,7 +10,6 @@
              x:Name="ThisControl" Focusable="True" GotFocus="ThisControl_GotFocus">
     <UserControl.Resources>
         <search:LogicalOrConverter x:Key="LogicalOr" />
-        <search:LogicalAndConverter x:Key="LogicalAnd" />
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
     <Grid>
