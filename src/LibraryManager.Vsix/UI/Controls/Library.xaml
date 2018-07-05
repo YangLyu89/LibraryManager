@@ -15,7 +15,7 @@
     </UserControl.Resources>
     <Grid>
         <!-- Text Entry -->
-        <TextBox x:Name="LibrarySearchBox" Text="{Binding ElementName=ThisControl, Path=Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" PreviewKeyDown="HandleKeyPress" KeyUp="HandleKeyUp" Padding="2 2 20 2" PreviewMouseLeftButtonUp="OnMousePositionCaret"/>
+        <TextBox x:Name="LibrarySearchBox" LostFocus="LibrarySearchBox_LostFocus" Text="{Binding ElementName=ThisControl, Path=Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" PreviewKeyDown="HandleKeyPress" KeyUp="HandleKeyUp" Padding="2 2 20 2" PreviewMouseLeftButtonUp="OnMousePositionCaret"/>
         <!-- Watermark -->
         <Label Opacity=".5" Visibility="{Binding ElementName=ThisControl, Path=IsTextEntryEmpty, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Top" IsHitTestVisible="False">
             <AccessText Text="{x:Static res:Text.TypeToSearch}" />

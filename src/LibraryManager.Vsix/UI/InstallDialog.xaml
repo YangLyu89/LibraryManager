@@ -159,35 +159,37 @@
         <DockPanel Grid.Row="4" 
                    Grid.ColumnSpan="4" 
                    LastChildFill="False">
-            <StackPanel VerticalAlignment="Top"
+            <Canvas Name="WarningMessagesPlaceholder">
+                <StackPanel VerticalAlignment="Top"
                         HorizontalAlignment="Left"
                         DockPanel.Dock="Left"
                         Orientation="Horizontal">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Path=AnyFileSelected}" Value="False">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Path=AnyFileSelected}" Value="True">
-                                <Setter Property="Visibility" Value="Hidden" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                <imaging:CrispImage Width="16" 
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=AnyFileSelected}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=AnyFileSelected}" Value="True">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <imaging:CrispImage Width="16" 
                                     Height="16" 
                                     DockPanel.Dock="Top" 
                                     HorizontalAlignment="Right">
-                    <imaging:CrispImage.Style>
-                        <Style TargetType="{x:Type imaging:CrispImage}">
-                            <Setter Property="Moniker" Value="{x:Static catalog:KnownMonikers.StatusWarning}" />
-                        </Style>
-                    </imaging:CrispImage.Style>
-                </imaging:CrispImage>
-                <Label Content="{x:Static resources:Text.NoFilesSelected}">
-                </Label>
-            </StackPanel>
+                        <imaging:CrispImage.Style>
+                            <Style TargetType="{x:Type imaging:CrispImage}">
+                                <Setter Property="Moniker" Value="{x:Static catalog:KnownMonikers.StatusWarning}" />
+                            </Style>
+                        </imaging:CrispImage.Style>
+                    </imaging:CrispImage>
+                    <Label Content="{x:Static resources:Text.NoFilesSelected}">
+                    </Label>
+                </StackPanel>
+            </Canvas>
             <Button Content="{x:Static resources:Text.Cancel}"
                     Width="65" 
                     DockPanel.Dock="Right"

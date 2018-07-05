@@ -26,6 +26,10 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI
 
             InitializeComponent();
 
+            // We don't want to show any warning messages on load.
+            // We'll wait for the user to choose a library before presenting any warnings.
+            WarningMessagesPlaceholder.Visibility = Visibility.Hidden;
+
             _libraryCommandService = libraryCommandService;
             _deps = dependencies;
             _fullPath = fullPath;

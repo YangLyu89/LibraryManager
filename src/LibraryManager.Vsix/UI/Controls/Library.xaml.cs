@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Web.LibraryManager.Contracts;
 
@@ -277,6 +278,18 @@ namespace Microsoft.Web.LibraryManager.Vsix.UI.Controls
         private IEnumerable<CompletionItem> FilterOutUnmatchedItems(IEnumerable<CompletionItem>items, string versionSuffix)
         {
             return items.Where(x => x.DisplayText.Contains(versionSuffix));
+        }
+
+        private void LibrarySearchBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            Canvas warningMessagesPlaceholder = ((InstallDialog)Window.GetWindow(this)).WarningMessagesPlaceholder;
+
+            // If the library search box is not empty, we'll activate the stack panel so that we
+            // can display warning messages, if any.
+            if (!string.IsNullOrEmpty(Text) && !warningMessagesPlaceholder.IsVisible)
+            {
+                warningMessagesPlaceholder.Visibility = Visibility.Visible;
+            }
         }
     }
 }
